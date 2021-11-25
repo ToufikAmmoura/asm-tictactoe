@@ -15,8 +15,6 @@ SECTION .data
 
     field_offsets   db  2, 6, 10, 26, 30, 34, 50, 54, 58
 
-    var     db      "WE ARRIVED HERE", 0h
-
 SECTION .bss
     field           resb    255         ; holds the playfield with the made choices
     turns           resb    9           ; 2D mapped into 1D array of the made turns: 1 for X, -1 for O
