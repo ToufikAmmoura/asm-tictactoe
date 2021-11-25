@@ -1,0 +1,1 @@
+nasm -g -f elf -o a.o $1 && echo "program compiled" && ld -g -m elf_i386 a.o && echo "program linked\n"
