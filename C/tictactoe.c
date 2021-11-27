@@ -1,5 +1,12 @@
 #include <unistd.h>
 #include <fcntl.h>
+#include "functions.c"
+
+/*
+NOTES:
+This will be the variant of the x86 program that still uses 
+syscalls instead of the simpler methods like printf()
+*/
 
 char field[255];
 char player_choice[255];
@@ -16,7 +23,7 @@ char* draw = "GAME ENDS IN A DRAW!";
 char* x_won = "PLAYER X WON!";
 char* o_won = "PLAYER O WON!";
 
-int field_offsets = {2,6,10,26,30,34,50,54,58};
+// int field_offsets = {2,6,10,26,30,34,50,54,58};
 
 void readField(char *buff){
   char* filename = "../field.txt";
@@ -25,13 +32,15 @@ void readField(char *buff){
   read(fd, buff, 255);
 }
 
-void turn(char player, int id){
-
-}
+// void turn(char player, int id){
+// }
 
 int main(){
   readField(field);
   write(STDOUT_FILENO, field, 255);
+
+  print(welcome_msg);
+
   return 0;
 }
 

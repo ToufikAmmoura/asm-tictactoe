@@ -284,7 +284,7 @@ _diagonalCheck:
 
 _printField:
     mov     eax, field
-    call    sprintLF
+    call    sprint
     ret
 
 _winnerIsX:
