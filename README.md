@@ -9,7 +9,4 @@
 the folders contain variants of this code in higher level languages
 
 #### C
-The idea is to get as close to the assembly program as possible but still use some of the advantages of C. This means that instead of printf I will be using write() for example. By doing it this way we'll be able to see how much more high level C is than x86.
-
-#### Python
-I will just program tictactoe in the most efficient way possible with the help of Python
+The idea is to make tictactoe with some of the helper-functions in C and the different type of flow control in such a way to get an idea of the difference of abstraction.

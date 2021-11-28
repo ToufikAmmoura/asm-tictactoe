@@ -1,6 +1,8 @@
 #include <unistd.h>
 #include <fcntl.h>
-#include "functions.c"
+#include <stdbool.h>
+#include <string.h>
+#include <stdio.h>
 
 /*
 NOTES:
@@ -23,7 +25,11 @@ char* draw = "GAME ENDS IN A DRAW!";
 char* x_won = "PLAYER X WON!";
 char* o_won = "PLAYER O WON!";
 
-// int field_offsets = {2,6,10,26,30,34,50,54,58};
+int field_offsets[] = {2,6,10,26,30,34,50,54,58};
+
+// Variables needed for the game
+int coordinate = 0;
+int offset = 0;
 
 void readField(char *buff){
   char* filename = "../field.txt";
@@ -32,15 +38,144 @@ void readField(char *buff){
   read(fd, buff, 255);
 }
 
-// void turn(char player, int id){
-// }
-
-int main(){
-  readField(field);
-  write(STDOUT_FILENO, field, 255);
-
-  print(welcome_msg);
-
-  return 0;
+void placeChar(char c){
+  int offset = field_offsets[coordinate];
+  field[offset] = c;
+  return;
 }
 
+void updateTurnsArray(int id){
+  turns[coordinate] = id;
+  return;
+}
+
+bool verifyTurn(){
+  return turns[coordinate] == 0;
+}
+
+bool checkAndParseInput(){
+  char c = player_choice[0];
+  if(c < '0' || '9' < c)
+    return false;
+
+  coordinate = ((int)c)-49;
+
+  return true;
+}
+
+void turn(char* message, char c, int id){
+  bool stop = false;
+  
+  do{
+    printf("%s", message);
+    scanf("%255s", player_choice);
+
+    stop = checkAndParseInput();
+    if(!stop){
+      message = wrong_input;
+      continue;
+    }
+
+    stop = verifyTurn();
+    if(!stop){
+      message = impossible_move;
+      continue;
+    }
+  }while(!stop);
+  
+  updateTurnsArray(id);
+  placeChar(c);
+  printf("%s", field);
+}
+
+void setupEnding(int sum){
+  return;
+//   if(sum == 3){
+//   }
+//   else{
+//   }
+}
+
+bool sumHor(){
+  for(offset=0; offset<9; offset+=3){
+    int sum = 0;
+    for(int i=0; i<3; i++){
+      sum += turns[i+offset]; 
+    }
+    if(sum == 3 || sum == -3){
+      setupEnding(sum);
+      return true;
+    }
+  }
+  return false;
+}
+
+bool sumVer(){
+  for(offset=0; offset<3; offset++){
+    int sum = 0;
+    for(int i=0; i<9; i+=3){
+      sum += turns[i+offset];
+    }
+    if(sum == 3 || sum == -3){
+      setupEnding(sum);
+      return true;
+    }
+  }
+  return false;
+}
+
+bool sumDia(){
+  int sum = 0;
+
+  sum = turns[0] + turns[4] + turns[8];
+  if(sum == 3 || sum == -3){
+      setupEnding(sum);
+      return true;
+  }
+
+  sum = turns[2] + turns[4] + turns[6];
+  if(sum == 3 || sum == -3){
+      setupEnding(sum);
+      return true;
+  }
+
+  return false;
+}
+
+bool referee(char* endmessage){
+  bool winnerH, winnerV, winnerD;
+
+  winnerH = sumHor();
+  winnerV = sumVer();
+  winnerD = sumDia();
+
+  return !(winnerH || winnerV || winnerD);
+}
+
+int main(){
+  bool playing = true;
+  int count = 0;
+  char* endmessage=draw;
+
+  readField(field);
+  printf("%s", field);
+  
+  // // dit kan echt wel beter tering, je moet een betere flow dan dit kunnen bedenken
+  while(playing){
+    turn(x_turn, 'X', 1);
+    count++;
+    if(count >= 5)
+      playing = referee(endmessage);
+
+    if(!playing || count == 9)
+      break;
+
+    turn(o_turn, 'O', -1);
+    count++;
+    if(count >= 5)
+      playing = referee(endmessage);
+  }
+
+  printf("%s", endmessage);
+  return 0;
+}
