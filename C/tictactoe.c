@@ -4,12 +4,6 @@
 #include <string.h>
 #include <stdio.h>
 
-/*
-NOTES:
-This will be the variant of the x86 program that still uses 
-syscalls instead of the simpler methods like printf()
-*/
-
 char field[255];
 char player_choice[255];
 int turns[9];
@@ -21,9 +15,11 @@ char* impossible_move = "THIS MOVE IS IMPOSSIBLE, TRY AGAIN: ";
 
 char* x_turn = "PLAYER X, CHOOSE A POSITION: ";
 char* o_turn = "PLAYER O, CHOOSE A POSITION: ";
-char* draw = "GAME ENDS IN A DRAW!";
-char* x_won = "PLAYER X WON!";
-char* o_won = "PLAYER O WON!";
+char* draw = "GAME ENDS IN A DRAW!\n";
+char* x_won = "PLAYER X WON!\n";
+char* o_won = "PLAYER O WON!\n";
+
+char* endmessage;
 
 int field_offsets[] = {2,6,10,26,30,34,50,54,58};
 
@@ -41,12 +37,10 @@ void readField(char *buff){
 void placeChar(char c){
   int offset = field_offsets[coordinate];
   field[offset] = c;
-  return;
 }
 
 void updateTurnsArray(int id){
   turns[coordinate] = id;
-  return;
 }
 
 bool verifyTurn(){
@@ -89,11 +83,12 @@ void turn(char* message, char c, int id){
 }
 
 void setupEnding(int sum){
-  return;
-//   if(sum == 3){
-//   }
-//   else{
-//   }
+  if(sum == 3){
+    endmessage = x_won;
+  }
+  else{
+    endmessage = o_won;
+  }
 }
 
 bool sumHor(){
@@ -142,7 +137,7 @@ bool sumDia(){
   return false;
 }
 
-bool referee(char* endmessage){
+bool referee(){
   bool winnerH, winnerV, winnerD;
 
   winnerH = sumHor();
@@ -155,25 +150,21 @@ bool referee(char* endmessage){
 int main(){
   bool playing = true;
   int count = 0;
-  char* endmessage=draw;
+  endmessage=draw;
 
   readField(field);
   printf("%s", field);
-  
-  // // dit kan echt wel beter tering, je moet een betere flow dan dit kunnen bedenken
-  while(playing){
-    turn(x_turn, 'X', 1);
-    count++;
-    if(count >= 5)
-      playing = referee(endmessage);
 
-    if(!playing || count == 9)
-      break;
-
-    turn(o_turn, 'O', -1);
+  while(playing && count < 9){
+    if(count%2==0){
+      turn(x_turn, 'X', 1);
+    } else{
+      turn(o_turn, 'O', -1);
+    }
     count++;
+
     if(count >= 5)
-      playing = referee(endmessage);
+      playing = referee();
   }
 
   printf("%s", endmessage);
